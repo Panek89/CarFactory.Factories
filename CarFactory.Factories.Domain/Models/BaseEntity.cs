@@ -1,4 +1,4 @@
-﻿namespace CarFactory.Factories.Domain;
+﻿namespace CarFactory.Factories.Domain.Models;
 
 public abstract class BaseEntity
 {
