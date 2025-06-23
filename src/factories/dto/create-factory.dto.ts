@@ -1,1 +1,3 @@
-export class CreateFactoryDto {}
+export class CreateFactoryDto {
+  name: string;
+}

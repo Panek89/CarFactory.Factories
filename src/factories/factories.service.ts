@@ -5,7 +5,7 @@ import { UpdateFactoryDto } from './dto/update-factory.dto';
 @Injectable()
 export class FactoriesService {
   create(createFactoryDto: CreateFactoryDto) {
-    return 'This action adds a new factory';
+    return `This action adds a new factory ${createFactoryDto.name}`;
   }
 
   findAll() {
@@ -17,7 +17,7 @@ export class FactoriesService {
   }
 
   update(id: number, updateFactoryDto: UpdateFactoryDto) {
-    return `This action updates a #${id} factory`;
+    return `This action updates a #${id} factory ${updateFactoryDto.name}`;
   }
 
   remove(id: number) {
