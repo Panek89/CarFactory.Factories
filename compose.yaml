@@ -1,0 +1,56 @@
+services:
+  mssql:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    container_name: carfactory-factories-mssql
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=${DB_PASSWORD}
+      - MSSQL_PID=Express
+    ports:
+      - "${DB_PORT}:${DB_PORT}"
+    healthcheck:
+      test: ["CMD-SHELL", "timeout 1 bash -c '</dev/tcp/localhost/${DB_PORT}' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+    networks:
+      - carfactory-factories-network
+    
+  mssql-init:
+    image: mcr.microsoft.com/mssql-tools
+    depends_on:
+      mssql:
+        condition: service_healthy
+    environment:
+      - DB_NAME=${DB_NAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_USERNAME=${DB_USERNAME}
+    volumes:
+      - ./init-db.sh:/init-db.sh
+    entrypoint: ["/bin/bash", "-c", "chmod +x /init-db.sh && /init-db.sh"]
+    networks:
+      - carfactory-factories-network
+
+  nestjs:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: carfactory-factories-api
+    ports:
+      - "3000:3000"
+    environment:
+      - DB_HOST=mssql
+      - DB_PORT=${DB_PORT}
+      - DB_USERNAME=sa
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
+    depends_on:
+      mssql-init:
+        condition: service_completed_successfully
+    networks:
+      - carfactory-factories-network
+
+networks:
+  carfactory-factories-network:
+    driver: bridge
