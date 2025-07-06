@@ -15,7 +15,7 @@ export class Factory {
   numberOfEmployees: number;
 
   @Column()
-  isOpen: boolean
+  isOpen: boolean;
 
   @Column()
   openDate: Date;
