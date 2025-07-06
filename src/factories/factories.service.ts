@@ -24,8 +24,14 @@ export class FactoriesService {
     return await this.factoryRepository.findBy({id});
   }
 
-  update(id: number, updateFactoryDto: UpdateFactoryDto) {
-    return `This action updates a #${id} factory ${updateFactoryDto.name}`;
+  async update(id: number, updateFactoryDto: UpdateFactoryDto) {
+    const factoryToUpdate = await this.factoryRepository.findOneBy({ id });
+    if (!factoryToUpdate) {
+      throw new NotFoundException(`Factory with ID ${id} not found`);
+    }
+
+    Object.assign(factoryToUpdate, updateFactoryDto);
+    return await this.factoryRepository.save(factoryToUpdate);
   }
 
   async remove(id: number) {
