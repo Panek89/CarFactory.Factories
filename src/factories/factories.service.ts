@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateFactoryDto } from './dto/create-factory.dto';
 import { UpdateFactoryDto } from './dto/update-factory.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -17,18 +17,23 @@ export class FactoriesService {
   }
 
   async findAll() {
-    return this.factoryRepository.find();
+    return await this.factoryRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} factory`;
+  async findOne(id: number) {
+    return await this.factoryRepository.findBy({id});
   }
 
   update(id: number, updateFactoryDto: UpdateFactoryDto) {
     return `This action updates a #${id} factory ${updateFactoryDto.name}`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} factory`;
+  async remove(id: number) {
+    const factory = await this.factoryRepository.findOneBy({ id });
+    if (!factory) {
+      throw new NotFoundException(`Factory with ID ${id} not found`);
+    }
+
+    return await this.factoryRepository.remove(factory);
   }
 }
