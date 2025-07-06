@@ -1,26 +1,45 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateFactoryDto } from './dto/create-factory.dto';
 import { UpdateFactoryDto } from './dto/update-factory.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Factory } from './entities/factory.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class FactoriesService {
-  create(createFactoryDto: CreateFactoryDto) {
-    return `This action adds a new factory ${createFactoryDto.name}`;
+  constructor(
+    @InjectRepository(Factory) private factoryRepository: Repository<Factory>
+  ) {}
+
+  async create(createFactoryDto: CreateFactoryDto) {
+    const factory = this.factoryRepository.create(createFactoryDto);
+    return await this.factoryRepository.save(factory);
   }
 
-  findAll() {
-    return `This action returns all factories`;
+  async findAll() {
+    return await this.factoryRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} factory`;
+  async findOne(id: number) {
+    return await this.factoryRepository.findBy({id});
   }
 
-  update(id: number, updateFactoryDto: UpdateFactoryDto) {
-    return `This action updates a #${id} factory ${updateFactoryDto.name}`;
+  async update(id: number, updateFactoryDto: UpdateFactoryDto) {
+    const factoryToUpdate = await this.factoryRepository.findOneBy({ id });
+    if (!factoryToUpdate) {
+      throw new NotFoundException(`Factory with ID ${id} not found`);
+    }
+
+    Object.assign(factoryToUpdate, updateFactoryDto);
+    return await this.factoryRepository.save(factoryToUpdate);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} factory`;
+  async remove(id: number) {
+    const factory = await this.factoryRepository.findOneBy({ id });
+    if (!factory) {
+      throw new NotFoundException(`Factory with ID ${id} not found`);
+    }
+
+    return await this.factoryRepository.remove(factory);
   }
 }

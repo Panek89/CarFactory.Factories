@@ -10,4 +10,16 @@ export class Factory {
 
   @Column()
   city: string;
+
+  @Column()
+  numberOfEmployees: number;
+
+  @Column()
+  isOpen: boolean;
+
+  @Column()
+  openDate: Date;
+
+  @Column({nullable: true})
+  closeDate: Date;
 }
