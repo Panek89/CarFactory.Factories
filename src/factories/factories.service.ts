@@ -11,8 +11,9 @@ export class FactoriesService {
     @InjectRepository(Factory) private factoryRepository: Repository<Factory>
   ) {}
 
-  create(createFactoryDto: CreateFactoryDto) {
-    return `This action adds a new factory ${createFactoryDto.name}`;
+  async create(createFactoryDto: CreateFactoryDto) {
+    const factory = this.factoryRepository.create(createFactoryDto);
+    return await this.factoryRepository.save(factory);
   }
 
   async findAll() {
