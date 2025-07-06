@@ -38,11 +38,11 @@ services:
       dockerfile: Dockerfile
     container_name: carfactory-factories-api
     ports:
-      - "3000:3000"
+      - "${API_PORT}:${API_PORT}"
     environment:
       - DB_HOST=mssql
       - DB_PORT=${DB_PORT}
-      - DB_USERNAME=sa
+      - DB_USERNAME=${DB_USERNAME}
       - DB_PASSWORD=${DB_PASSWORD}
       - DB_NAME=${DB_NAME}
     depends_on:
