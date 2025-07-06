@@ -3,10 +3,11 @@ import { FactoriesService } from './factories.service';
 import { FactoriesController } from './factories.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Factory } from './entities/factory.entity';
+import { FactorySeederService } from 'src/db/seeder/factorySeeder.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Factory])],
   controllers: [FactoriesController],
-  providers: [FactoriesService],
+  providers: [FactoriesService, FactorySeederService],
 })
 export class FactoriesModule {}
