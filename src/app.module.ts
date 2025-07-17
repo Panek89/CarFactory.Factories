@@ -5,20 +5,22 @@ import { FactoriesModule } from './factories/factories.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Factory } from './factories/entities/factory.entity';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { AppConfigModule } from './configuration/app-config.module';
+import { AppConfigService } from './configuration/app-config.service';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
+      imports: [AppConfigModule],
+      inject: [AppConfigService],
+      useFactory: (config: AppConfigService) => ({
         type: 'mssql',
-        host: config.get('DB_HOST'),
-        port: parseInt(config.get('DB_PORT')!),
-        username: config.get('DB_USERNAME'),
-        password: config.get('DB_PASSWORD'),
-        database: config.get('DB_NAME'),
+        host: config.dbHost,
+        port: config.dbPort,
+        username: config.dbUsername,
+        password: config.dbPassword,
+        database: config.dbName,
         options: {
           trustServerCertificate: true,
         },
