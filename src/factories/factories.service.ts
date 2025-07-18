@@ -6,6 +6,7 @@ import { AppConfigService } from 'src/configuration/app-config.service';
 import { Factory } from './entities/factory.entity';
 import { CreateFactoryDto } from './dto/create-factory.dto';
 import { UpdateFactoryDto } from './dto/update-factory.dto';
+import { CreatedFactoryDto } from './dto/created-factory.dto';
 import { RABBITMQ_CLIENT } from 'src/infrastructure/rabbit-mq/rabbitmq.constats';
 
 @Injectable()
@@ -21,7 +22,14 @@ export class FactoriesService {
     const factory = this.factoryRepository.create(createFactoryDto);
 
     const createdFactory = await this.factoryRepository.save(factory);
-    this.client.emit(this.appConfigService.rabbitQueue, createdFactory);
+    const createdFactoryDto: CreatedFactoryDto = {
+      id: createdFactory.id,
+      name: createdFactory.name,
+      city: createdFactory.city,
+      numberOfEmployees: createdFactory.numberOfEmployees
+    }
+
+    this.client.emit(this.appConfigService.rabbitQueue, createdFactoryDto);
     
     return createdFactory;
   }
