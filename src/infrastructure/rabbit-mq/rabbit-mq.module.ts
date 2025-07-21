@@ -15,8 +15,8 @@ import { RABBITMQ_CLIENT } from './rabbitmq.constats';
             transport: Transport.RMQ,
             options: {
               urls: [configService.rabbitUrl],
-              queue: configService.rabbitQueue,
-              queueOptions: { durable: false },
+              queue: configService.rabbitFactoriesQueue,
+              queueOptions: { durable: true },
             },
         })
       },
