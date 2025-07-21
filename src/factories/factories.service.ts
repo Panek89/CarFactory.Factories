@@ -9,6 +9,8 @@ import { UpdateFactoryDto } from './dto/update-factory.dto';
 import { RABBITMQ_CLIENT } from 'src/infrastructure/rabbit-mq/rabbitmq.constats';
 import { MassTransitService } from 'src/infrastructure/mass-transit/mass-transit.service';
 import { MassTransitMessage } from 'src/infrastructure/mass-transit/models/MassTransitMessage';
+import { FACTORY_CREATED_EVENT } from 'src/contracts/events/FactoryCreatedEvent';
+import { CARFACTORY_EMPLOYEES_CONTRACTS_NAMESPACE } from 'src/contracts/events/Consts';
 
 @Injectable()
 export class FactoriesService {
@@ -25,8 +27,8 @@ export class FactoriesService {
     const createdFactory = await this.factoryRepository.save(factory);
 
     const massTransitMessage: MassTransitMessage = {
-      namespace: 'CarFactory.Employees.Contracts.Events',
-      className: 'FactoryCreated',
+      namespace: CARFACTORY_EMPLOYEES_CONTRACTS_NAMESPACE,
+      className: FACTORY_CREATED_EVENT,
       data: {
         id: createdFactory.id,
         name: createdFactory.name,
