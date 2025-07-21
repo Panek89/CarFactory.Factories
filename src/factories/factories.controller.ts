@@ -27,16 +27,16 @@ export class FactoriesController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.factoriesService.findOne(+id);
+    return this.factoriesService.findOne(id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateFactoryDto: UpdateFactoryDto) {
-    return this.factoriesService.update(+id, updateFactoryDto);
+    return this.factoriesService.update(id, updateFactoryDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.factoriesService.remove(+id);
+    return this.factoriesService.remove(id);
   }
 }
