@@ -30,11 +30,27 @@ export class AppConfigService {
     return this.configService.get<string>('DB_NAME') ?? 'CarFactory_Factories';
   }
 
-  get rabbitUrl(): string {
-    return this.configService.get<string>('RABBITMQ_URL') ?? 'amqp://localhost:5672';
+  get rabbitPort(): string {
+    return this.configService.get<string>('RABBITMQ_PORT') ?? '5672';
   }
 
-  get rabbitQueue(): string {
-    return this.configService.get<string>('RABBITMQ_QUEUE') ?? 'default-queue';
+  get rabbitServiceName(): string {
+    return this.configService.get<string>('RABBITMQ_SERVICE_NAME') ?? 'localhost';
+  }
+
+  get rabbitUser(): string {
+    return this.configService.get<string>('RABBITMQ_USER') ?? 'guest';
+  }
+
+  get rabbitPassword(): string {
+    return this.configService.get<string>('RABBITMQ_PASSWORD') ?? 'guest';
+  }
+
+  get rabbitFactoriesQueue(): string {
+    return this.configService.get<string>('RABBITMQ_FACTORIES_QUEUE') ?? 'default-queue';
+  }
+
+  get rabbitUrl(): string {
+    return `amqp://${this.rabbitUser}:${this.rabbitPassword}@${this.rabbitServiceName}:${this.rabbitPort}`;
   }
 }

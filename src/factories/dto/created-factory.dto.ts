@@ -1,5 +1,5 @@
 export class CreatedFactoryDto {
-    id: number;
+    id: string;
     name: string;
     city: string;
     numberOfEmployees: number;

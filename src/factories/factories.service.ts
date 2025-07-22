@@ -6,31 +6,39 @@ import { AppConfigService } from 'src/configuration/app-config.service';
 import { Factory } from './entities/factory.entity';
 import { CreateFactoryDto } from './dto/create-factory.dto';
 import { UpdateFactoryDto } from './dto/update-factory.dto';
-import { CreatedFactoryDto } from './dto/created-factory.dto';
 import { RABBITMQ_CLIENT } from 'src/infrastructure/rabbit-mq/rabbitmq.constats';
+import { MassTransitService } from 'src/infrastructure/mass-transit/mass-transit.service';
+import { MassTransitMessage } from 'src/infrastructure/mass-transit/models/MassTransitMessage';
+import { FACTORY_CREATED_EVENT } from 'src/contracts/events/FactoryCreatedEvent';
+import { CARFACTORY_EMPLOYEES_CONTRACTS_NAMESPACE } from 'src/contracts/events/Consts';
 
 @Injectable()
 export class FactoriesService {
   constructor(
     @InjectRepository(Factory) private factoryRepository: Repository<Factory>,
     @Inject(RABBITMQ_CLIENT) private client: ClientProxy,
-    private appConfigService: AppConfigService
+    private appConfigService: AppConfigService,
+    private massTransitService: MassTransitService,
   ) {
   }
 
   async create(createFactoryDto: CreateFactoryDto) {
     const factory = this.factoryRepository.create(createFactoryDto);
-
     const createdFactory = await this.factoryRepository.save(factory);
-    const createdFactoryDto: CreatedFactoryDto = {
-      id: createdFactory.id,
-      name: createdFactory.name,
-      city: createdFactory.city,
-      numberOfEmployees: createdFactory.numberOfEmployees
-    }
 
-    this.client.emit(this.appConfigService.rabbitQueue, createdFactoryDto);
-    
+    const massTransitMessage: MassTransitMessage = {
+      namespace: CARFACTORY_EMPLOYEES_CONTRACTS_NAMESPACE,
+      className: FACTORY_CREATED_EVENT,
+      data: {
+        id: createdFactory.id,
+        name: createdFactory.name,
+        city: createdFactory.city,
+        numberOfEmployees: createdFactory.numberOfEmployees,
+      },
+      queue: this.appConfigService.rabbitFactoriesQueue
+    }
+    this.massTransitService.publishMessage(massTransitMessage);
+
     return createdFactory;
   }
 
@@ -38,11 +46,11 @@ export class FactoriesService {
     return await this.factoryRepository.find();
   }
 
-  async findOne(id: number) {
+  async findOne(id: string) {
     return await this.factoryRepository.findBy({id});
   }
 
-  async update(id: number, updateFactoryDto: UpdateFactoryDto) {
+  async update(id: string, updateFactoryDto: UpdateFactoryDto) {
     const factoryToUpdate = await this.factoryRepository.findOneBy({ id });
     if (!factoryToUpdate) {
       throw new NotFoundException(`Factory with ID ${id} not found`);
@@ -50,12 +58,12 @@ export class FactoriesService {
 
     Object.assign(factoryToUpdate, updateFactoryDto);
     const updatedFactory = await this.factoryRepository.save(factoryToUpdate);
-    this.client.emit(this.appConfigService.rabbitQueue, updatedFactory);
+    this.client.emit(this.appConfigService.rabbitFactoriesQueue, updatedFactory);
     
     return updatedFactory;
   }
 
-  async remove(id: number) {
+  async remove(id: string) {
     const factory = await this.factoryRepository.findOneBy({ id });
     if (!factory) {
       throw new NotFoundException(`Factory with ID ${id} not found`);

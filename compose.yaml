@@ -69,8 +69,10 @@ services:
       - DB_USERNAME=${DB_USERNAME}
       - DB_PASSWORD=${DB_PASSWORD}
       - DB_NAME=${DB_NAME}
-      - RABBITMQ_URL=${RABBITMQ_URL}
-      - RABBITMQ_QUEUE=${RABBITMQ_QUEUE}
+      - RABBITMQ_SERVICE_NAME=rabbitmq
+      - RABBITMQ_USER=${RABBITMQ_USER}
+      - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD}
+      - RABBITMQ_FACTORIES_QUEUE=${RABBITMQ_FACTORIES_QUEUE}
     depends_on:
       mssql-init:
         condition: service_completed_successfully
