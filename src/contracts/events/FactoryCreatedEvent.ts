@@ -1,1 +1,1 @@
-export const FACTORY_CREATED_EVENT = 'FactoryCreated';
+export const FACTORY_CREATED_EVENT = 'IFactoryCreated';
