@@ -10,7 +10,15 @@ async function bootstrap() {
     .setDescription('Factories microservice API documentation from CarFactory application')
     .setVersion('1.0')
     .addTag('factories')
-    .build();
+    .addTag('auth')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+      },
+      'access-token',
+    ).build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, documentFactory);
 
