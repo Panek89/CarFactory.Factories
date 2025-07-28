@@ -53,4 +53,28 @@ export class AppConfigService {
   get rabbitUrl(): string {
     return `amqp://${this.rabbitUser}:${this.rabbitPassword}@${this.rabbitServiceName}:${this.rabbitPort}`;
   }
+
+  get keycloakPort(): string {
+    return this.configService.get<string>('KEYCLOAK_PORT') ?? '';
+  }
+
+  get keycloakHost(): string {
+    return this.configService.get<string>('KEYCLOAK_HOST') ?? '';
+  }
+
+  get keycloakRealm(): string {
+    return this.configService.get<string>('KEYCLOAK_REALM') ?? '';
+  }
+
+  get keycloakClientId(): string {
+    return this.configService.get<string>('KEYCLOAK_CLIENT_ID') ?? '';
+  }
+
+  get keycloakClientSecret(): string {
+    return this.configService.get<string>('KEYCLOAK_CLIENT_SECRET') ?? '';
+  }
+
+  get keycloakClientAudience(): string {
+    return this.configService.get<string>('KEYCLOAK_AUDIENCE') ?? '';
+  }
 }
