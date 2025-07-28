@@ -7,9 +7,10 @@ import { FactoriesController } from './factories.controller';
 import { Factory } from './entities/factory.entity';
 import { FactorySeederService } from 'src/db/seeder/factorySeeder.service';
 import { MassTransitModule } from 'src/infrastructure/mass-transit/mass-transit.module';
+import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Factory]), RabbitMqModule, AppConfigModule, MassTransitModule],
+  imports: [AuthModule, TypeOrmModule.forFeature([Factory]), RabbitMqModule, AppConfigModule, MassTransitModule],
   controllers: [FactoriesController],
   providers: [FactoriesService, FactorySeederService],
 })

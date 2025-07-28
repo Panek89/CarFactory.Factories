@@ -7,6 +7,7 @@ import { Factory } from './factories/entities/factory.entity';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AppConfigModule } from './configuration/app-config.module';
 import { AppConfigService } from './configuration/app-config.service';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { AppConfigService } from './configuration/app-config.service';
         synchronize: true,
       }),
     }),
+    AuthModule,
     FactoriesModule,
   ],
   controllers: [AppController],
