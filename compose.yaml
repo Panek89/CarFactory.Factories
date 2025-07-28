@@ -41,6 +41,42 @@ services:
     networks:
       - carfactory-factories-network
 
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0
+    environment:
+      KC_HOSTNAME: localhost
+      KC_HOSTNAME_PORT: ${KEYCLOAK_PORT}
+      KC_HOSTNAME_STRICT: "true"
+      KC_HOSTNAME_STRICT_BACKCHANNEL: "true"
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+      KC_HEALTH_ENABLED: "true"
+      KC_LOG_LEVEL: info
+    healthcheck:
+      test: ["CMD-SHELL", "timeout 2 bash -c '</dev/tcp/localhost/${KEYCLOAK_PORT}'"]
+      interval: 15s
+      timeout: 5s
+      retries: 15
+      start_period: 60s
+    command: ["start-dev", "--http-port", "${KEYCLOAK_PORT}", "--hostname", "${KEYCLOAK_HOST}", "--hostname-strict=true"]
+    ports:
+      - "${KEYCLOAK_PORT}:${KEYCLOAK_PORT}"
+    networks:
+      - carfactory-factories-network
+
+  keycloak-init:
+    image: curlimages/curl:latest
+    depends_on:
+      keycloak:
+        condition: service_healthy
+    env_file:
+      - .env
+    volumes:
+      - ./keycloak-init.sh:/init.sh:ro
+    command: ["/bin/sh", "/init.sh"]
+    networks:
+      - carfactory-factories-network
+    
   mssql-init:
     image: mcr.microsoft.com/mssql-tools
     depends_on:
@@ -73,11 +109,21 @@ services:
       - RABBITMQ_USER=${RABBITMQ_USER}
       - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD}
       - RABBITMQ_FACTORIES_QUEUE=${RABBITMQ_FACTORIES_QUEUE}
+      - KEYCLOAK_PORT=${KEYCLOAK_PORT}
+      - KEYCLOAK_HOST=${KEYCLOAK_HOST}
+      - KEYCLOAK_REALM=${KEYCLOAK_REALM}
+      - KEYCLOAK_CLIENT_ID=${KEYCLOAK_CLIENT_ID}
+      - KEYCLOAK_CLIENT_SECRET=${KEYCLOAK_CLIENT_SECRET}
+      - KEYCLOAK_AUDIENCE=${KEYCLOAK_AUDIENCE}
     depends_on:
       mssql-init:
         condition: service_completed_successfully
       rabbitmq:
         condition: service_healthy
+      keycloak:
+        condition: service_healthy
+      keycloak-init:
+        condition: service_completed_successfully
     networks:
       - carfactory-factories-network
 
