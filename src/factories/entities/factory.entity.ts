@@ -20,6 +20,6 @@ export class Factory {
   @Column()
   openDate: Date;
 
-  @Column({nullable: true})
+  @Column({ nullable: true })
   closeDate: Date;
 }
