@@ -5,24 +5,24 @@ import { ConfigService } from '@nestjs/config';
 export class AppConfigService {
   constructor(private configService: ConfigService) {}
 
-	get dbType(): string {
-		return this.configService.get<string>('DB_TYPE') ?? 'mssql';
-	}
+  get dbType(): string {
+    return this.configService.get<string>('DB_TYPE') ?? 'mssql';
+  }
 
   get dbHost(): string {
     return this.configService.get<string>('DB_HOST') ?? 'localhost';
   }
 
   get dbPort(): number {
-		const value = this.configService.get<string>('DB_PORT') ?? '1433';
-		return parseInt(value);
-	}
+    const value = this.configService.get<string>('DB_PORT') ?? '1433';
+    return parseInt(value);
+  }
 
-	get dbUsername(): string {
-		return this.configService.get<string>('DB_USERNAME') ?? 'sa';
-	}
+  get dbUsername(): string {
+    return this.configService.get<string>('DB_USERNAME') ?? 'sa';
+  }
 
-	get dbPassword(): string {
+  get dbPassword(): string {
     return this.configService.get<string>('DB_PASSWORD') ?? '';
   }
 
@@ -35,7 +35,9 @@ export class AppConfigService {
   }
 
   get rabbitServiceName(): string {
-    return this.configService.get<string>('RABBITMQ_SERVICE_NAME') ?? 'localhost';
+    return (
+      this.configService.get<string>('RABBITMQ_SERVICE_NAME') ?? 'localhost'
+    );
   }
 
   get rabbitUser(): string {
@@ -47,7 +49,10 @@ export class AppConfigService {
   }
 
   get rabbitFactoriesQueue(): string {
-    return this.configService.get<string>('RABBITMQ_FACTORIES_QUEUE') ?? 'default-queue';
+    return (
+      this.configService.get<string>('RABBITMQ_FACTORIES_QUEUE') ??
+      'default-queue'
+    );
   }
 
   get rabbitUrl(): string {
