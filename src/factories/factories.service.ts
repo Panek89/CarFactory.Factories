@@ -9,7 +9,10 @@ import { UpdateFactoryDto } from './dto/update-factory.dto';
 import { RABBITMQ_CLIENT } from 'src/infrastructure/rabbit-mq/rabbitmq.constats';
 import { MassTransitService } from 'src/infrastructure/mass-transit/mass-transit.service';
 import { MassTransitMessage } from 'src/infrastructure/mass-transit/models/MassTransitMessage';
-import { FACTORY_CREATED_EVENT } from 'src/contracts/events/FactoryCreatedEvent';
+import {
+  FACTORY_CREATED_EVENT,
+  FACTORY_UPDATED_EVENT,
+} from 'src/contracts/events/FactoryEvents';
 import { CARFACTORY_EMPLOYEES_CONTRACTS_NAMESPACE } from 'src/contracts/events/Consts';
 
 @Injectable()
@@ -19,8 +22,7 @@ export class FactoriesService {
     @Inject(RABBITMQ_CLIENT) private client: ClientProxy,
     private appConfigService: AppConfigService,
     private massTransitService: MassTransitService,
-  ) {
-  }
+  ) {}
 
   async create(createFactoryDto: CreateFactoryDto) {
     const factory = this.factoryRepository.create(createFactoryDto);
@@ -32,12 +34,11 @@ export class FactoriesService {
       data: {
         id: createdFactory.id,
         name: createdFactory.name,
-        city: createdFactory.city,
-        numberOfEmployees: createdFactory.numberOfEmployees,
+        isOpen: createdFactory.isOpen,
       },
-      queue: this.appConfigService.rabbitFactoriesQueue
-    }
-    this.massTransitService.publishMessage(massTransitMessage);
+      queue: this.appConfigService.rabbitFactoriesQueue,
+    };
+    await this.massTransitService.publishMessage(massTransitMessage);
 
     return createdFactory;
   }
@@ -47,7 +48,7 @@ export class FactoriesService {
   }
 
   async findOne(id: string) {
-    return await this.factoryRepository.findBy({id});
+    return await this.factoryRepository.findBy({ id });
   }
 
   async update(id: string, updateFactoryDto: UpdateFactoryDto) {
@@ -58,8 +59,19 @@ export class FactoriesService {
 
     Object.assign(factoryToUpdate, updateFactoryDto);
     const updatedFactory = await this.factoryRepository.save(factoryToUpdate);
-    this.client.emit(this.appConfigService.rabbitFactoriesQueue, updatedFactory);
-    
+
+    const massTransitMessage: MassTransitMessage = {
+      namespace: CARFACTORY_EMPLOYEES_CONTRACTS_NAMESPACE,
+      className: FACTORY_UPDATED_EVENT,
+      data: {
+        id: updatedFactory.id,
+        name: updatedFactory.name,
+        isOpen: updatedFactory.isOpen,
+      },
+      queue: this.appConfigService.rabbitFactoriesQueue,
+    };
+    await this.massTransitService.publishMessage(massTransitMessage);
+
     return updatedFactory;
   }
 
