@@ -6,11 +6,11 @@ import { AppConfigService } from 'src/configuration/app-config.service';
 
 @Injectable()
 export class MassTransitService {
-	private readonly logger = new Logger(MassTransitService.name);
+  private readonly logger = new Logger(MassTransitService.name);
 
-	constructor(private appConfigService: AppConfigService) { }
+  constructor(private appConfigService: AppConfigService) {}
 
-	async publishMessage(message: MassTransitMessage): Promise<void> {
+  async publishMessage(message: MassTransitMessage): Promise<void> {
     let connection: amqp.Connection | null = null;
     let channel: amqp.Channel | null = null;
 
@@ -31,17 +31,22 @@ export class MassTransitService {
           contentType: 'application/vnd.masstransit+json',
           deliveryMode: 2,
           headers: {
-            'MT-Message-Type': urn
+            'MT-Message-Type': urn,
           },
-					messageId: envelope.messageId,
+          messageId: envelope.messageId,
           correlationId: envelope.conversationId,
-          timestamp: Date.now()
-        }
+          timestamp: Date.now(),
+        },
       );
 
-      this.logger.log(`Message sent to queue ${message.queue}: ${message.className}`);
+      this.logger.log(
+        `Message sent to queue ${message.queue}: ${message.className}`,
+      );
     } catch (error) {
-      this.logger.error(`Failed to send message: ${error.message}`, error.stack);
+      this.logger.error(
+        `Failed to send message: ${error.message}`,
+        error.stack,
+      );
       throw error;
     } finally {
       if (channel) await channel.close();
@@ -49,13 +54,13 @@ export class MassTransitService {
     }
   }
 
-	private generateUrn(namespace: string, className: string): string {
+  private generateUrn(namespace: string, className: string): string {
     return `urn:message:${namespace}:${className}`;
   }
 
-	private createEnvelope(message: MassTransitMessage) {
+  private createEnvelope(message: MassTransitMessage) {
     const urn = this.generateUrn(message.namespace, message.className);
-    
+
     return {
       messageId: uuid(),
       conversationId: uuid(),
@@ -65,11 +70,11 @@ export class MassTransitService {
       message: message.data,
       sentTime: new Date().toISOString(),
       headers: {},
-			expirationTime: null,
+      expirationTime: null,
       requestId: null,
       correlationId: null,
       initiatorId: null,
-      scheduledTime: null
+      scheduledTime: null,
     };
   }
 }
